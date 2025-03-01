@@ -1,3 +1,6 @@
+// try the nvidia deepseek api
+// https://build.nvidia.com/deepseek-ai/deepseek-r1?snippet_tab=node
+
 import OpenAI from "openai";
 import dotenv from "dotenv";
 dotenv.config();

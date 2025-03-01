@@ -1,5 +1,5 @@
+// try the grok 2 api
 // https://docs.x.ai/docs/tutorial#step-1-create-an-xai-account
-
 import OpenAI from "openai";
 import dotenv from "dotenv";
 import fs from "fs";
