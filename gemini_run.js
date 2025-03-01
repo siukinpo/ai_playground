@@ -4,6 +4,7 @@
 // https://ai.google.dev/gemini-api/docs/vision?hl=zh-tw&lang=node
 
 // 文字生成：https://ai.google.dev/gemini-api/docs/text-generation?hl=zh-tw&lang=node
+// 處理圖片和影片：https://ai.google.dev/gemini-api/docs/vision?hl=zh-tw&lang=node
 // 注意：Gemini API 存取有地區限制
 // 1. Google AI Studio 網頁版可以在香港地區正常使用
 // 2. 但透過 API 從香港發出的請求會被阻擋
