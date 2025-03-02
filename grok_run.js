@@ -11,17 +11,19 @@ const client = new OpenAI({
   baseURL: "https://api.x.ai/v1",
 });
 
+// 1. Normal , without stream
+// https://docs.x.ai/docs/guides/chat
 async function grok_run_text() {
   const completion = await client.chat.completions.create({
     model: "grok-2-latest",
     messages: [
       {
         role: "system",
-        content: "你是一位出色且富有創造力的數學家，擅長解決各種數學問題。",
+        content: "You are a PhD-level mathematician.",
       },
       {
         role: "user",
-        content: "3.11和3.9哪一個比較大? 以及提供詳盡解釋",
+        content: "What is 2 + 2? 請用繁體中文回答 並提供詳細解釋",
       },
     ],
     model: "grok-2-latest",
@@ -32,32 +34,31 @@ async function grok_run_text() {
   console.log(completion.choices[0].message.content);
 }
 
-async function grok_run_image(image_url) {
-  const completion = await client.chat.completions.create({
-    model: "grok-2-vision-latest",
+// 2. Streaming , with stream
+// https://docs.x.ai/docs/guides/streaming-response
+async function grok_run_text_stream() {
+  const result = await client.chat.completions.create({
+    model: "grok-2-latest",
     messages: [
       {
+        role: "system",
+        content: "You are a PhD-level mathematician.",
+      },
+      {
         role: "user",
-        content: [
-          {
-            type: "image_url",
-            image_url: {
-              url: image_url,
-              detail: "high",
-            },
-          },
-          {
-            type: "text",
-            text: "這圖片中有什麼？",
-          },
-        ],
+        content: "What is 2 + 2? 請用繁體中文回答 並提供詳細解釋",
       },
     ],
+    stream: true,
   });
 
-  console.log(completion.choices[0].message.content);
+  for await (const chunk of result) {
+    process.stdout.write(chunk.choices[0].delta.content || "");
+  }
 }
 
+// 3. 使用圖片 , with stream
+// https://docs.x.ai/docs/guides/image-understanding#base64-string-input
 async function grok_run_any_image(imagePath) {
   try {
     let imageUrl;
@@ -74,7 +75,7 @@ async function grok_run_any_image(imagePath) {
       imageUrl = `data:${mimeType};base64,${base64Image}`;
     }
 
-    const completion = await client.chat.completions.create({
+    const result = await client.chat.completions.create({
       model: "grok-2-vision-latest",
       messages: [
         {
@@ -94,9 +95,13 @@ async function grok_run_any_image(imagePath) {
           ],
         },
       ],
+      stream: true,
     });
 
-    console.log(completion.choices[0].message.content);
+    // console.log(completion.choices[0].message.content);
+    for await (const chunk of result) {
+      process.stdout.write(chunk.choices[0].delta.content || "");
+    }
   } catch (error) {
     console.error("處理圖片時出錯:", error);
   }
@@ -119,16 +124,11 @@ function getMimeType(filePath) {
 const image_list = [
   "https://science.nasa.gov/wp-content/uploads/2023/09/web-first-images-release.png",
   "./strawberry_souffle.jpeg",
+  "https://i.ytimg.com/vi/oJAPUFXIaqo/maxresdefault.jpg",
+  "https://hkppltravel.com/wp-content/uploads/2020/01/%E8%B6%85%E5%8E%9A%E5%BF%8C%E5%BB%89%E5%A3%AB%E5%A4%9A%E5%95%A4%E6%A2%A8%E6%A2%B3%E4%B9%8E%E5%8E%98%E7%8F%AD%E6%88%9F.jpg",
 ];
 
-// grok_run_text();
-
 // 測試示例
-// 1. 使用網絡圖片
-grok_run_any_image(image_list[1]);
-
-// 2. 使用本地圖片
-// grok_run_any_image("./strawberry_souffle.jpeg");
-
-// 3. 你可以根據需要切換不同的圖片
-// grok_run_any_image(image_list[1]);
+// grok_run_text();
+// grok_run_text_stream();
+grok_run_any_image(image_list[2]);
